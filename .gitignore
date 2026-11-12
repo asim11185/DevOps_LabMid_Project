@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+submissions.json
+test-results.json
+ci-report.json
+test-report.json
+.env

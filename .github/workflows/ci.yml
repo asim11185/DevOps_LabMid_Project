@@ -1,0 +1,84 @@
+name: Assignment Portal CI
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  test-and-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run automated tests
+        id: tests
+        continue-on-error: true
+        run: python run_tests.py
+
+      - name: Build complete CI report
+        if: always()
+        run: python build_ci_report.py
+
+      - name: Send report to local receiver
+        if: always()
+        env:
+          REPORT_RECEIVER_URL: ${{ secrets.REPORT_RECEIVER_URL }}
+        run: |
+          python - <<'PY'
+          import os, urllib.request
+          url = os.environ.get("REPORT_RECEIVER_URL", "").strip()
+          if not url:
+              print("REPORT_RECEIVER_URL secret is not configured; report delivery skipped.")
+              raise SystemExit(0)
+          data = open("ci-report.json", "rb").read()
+          request = urllib.request.Request(url, data=data,
+              headers={"Content-Type": "application/json"}, method="POST")
+          with urllib.request.urlopen(request, timeout=30) as response:
+              print("Receiver response:", response.status, response.read().decode())
+          PY
+
+      - name: Upload report as GitHub artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report-${{ github.run_id }}
+          path: ci-report.json
+          if-no-files-found: warn
+
+      - name: Mark workflow failed when tests failed
+        if: steps.tests.outcome == 'failure'
+        run: exit 1
+
+  deploy-pages:
+    needs: test-and-report
+    if: success() && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload static portal demo
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

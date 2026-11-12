@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Assignment Submission Portal Demo</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f2f6fc;color:#182235;margin:0}
+main{max-width:760px;margin:50px auto;padding:24px;background:white;border-radius:12px}
+h1{color:#174a8b}label{display:block;margin-top:14px;font-weight:bold}
+input{box-sizing:border-box;width:100%;padding:10px;margin-top:5px}
+button{margin-top:18px;padding:11px 16px;background:#1769aa;color:white;border:0;border-radius:5px}
+#notice{color:#087443}
+</style></head>
+<body><main>
+<h1>Assignment Submission Portal</h1>
+<p>This GitHub Pages demo shows the portal interface. The working Flask application runs locally.</p>
+<form id="demo">
+<label>Student name</label><input required>
+<label>Registration number</label><input required>
+<label>Assignment title</label><input required>
+<label>Submission URL</label><input type="url" required placeholder="https://example.com">
+<button>Validate demo submission</button>
+</form><p id="notice"></p>
+<script>
+document.getElementById('demo').addEventListener('submit',function(e){
+ e.preventDefault();document.getElementById('notice').textContent='Demo form validated. Submit through the local Flask application to save a real submission.';
+});
+</script>
+</main></body></html>
