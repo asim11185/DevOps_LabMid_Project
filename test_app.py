@@ -42,7 +42,7 @@ class SubmissionPortalTests(unittest.TestCase):
         })
         self.assertEqual(response.status_code, 400)
         self.assertIn(b"valid HTTP or HTTPS", response.data)
-        self.assertEqual(response.status_code, 400)
+       # self.assertEqual(response.status_code, 400)
        # self.assertIn(b"Please enter a valid HTTP or HTTPS submission URL.", response.data)
 
 if __name__ == "__main__":
