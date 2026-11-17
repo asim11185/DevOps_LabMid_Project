@@ -54,7 +54,7 @@ def load_submissions():
         return []
 
 def validate_submission(data):
-    required = ("student_name", "registration_number", "assignment_title", "submission_url")
+    required = ("student_name",  "assignment_title", "submission_url")
     for field in required:
         if not str(data.get(field, "")).strip():
             return False, f"{field.replace('_', ' ').title()} is required."
